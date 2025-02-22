@@ -12,6 +12,7 @@ args = parser.parse_args()
 import os
 import json
 from collections import Counter,defaultdict
+import matplotlib.pyplot as plt
 
 # open the input path
 with open(args.input_path) as f:
@@ -24,5 +25,23 @@ if args.percent:
 
 # print the count values
 items = sorted(counts[args.key].items(), key=lambda item: (item[1],item[0]), reverse=True)
-for k,v in items:
-    print(k,':',v)
+
+top10 = items[-10:]
+keys = [k for k, v in top10]
+values = [v for k, v in top10]
+if "country" in args.input_path:
+    x="countries"
+else:
+    x="languages"
+
+# Create the bar chart
+plt.figure(figsize=(10, 6))
+plt.bar(keys, values, color='skyblue')
+plt.xlabel(x)
+plt.ylabel(f'{args.key} occurances')
+plt.title(f'Top 10 {x} by {args.key}')
+plt.xticks(rotation=45)
+plt.tight_layout()
+
+# Save the plot as a PNG image
+plt.savefig(f'{args.input_path + args.key}.png')
