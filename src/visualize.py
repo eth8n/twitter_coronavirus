@@ -12,7 +12,7 @@ args = parser.parse_args()
 import os
 import json
 from collections import Counter,defaultdict
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt 
 
 # open the input path
 with open(args.input_path) as f:
@@ -23,25 +23,26 @@ if args.percent:
     for k in counts[args.key]:
         counts[args.key][k] /= counts['_all'][k]
 
-# print the count values
-items = sorted(counts[args.key].items(), key=lambda item: (item[1],item[0]), reverse=True)
+top10_desc = sorted(counts[args.key].items(), key=lambda item: item[1], reverse=True)[:10]
+# Then sort these top 10 in ascending order (low to high)
+top10_sorted = sorted(top10_desc, key=lambda item: item[1])
 
-top10 = items[-10:]
-keys = [k for k, v in top10]
-values = [v for k, v in top10]
-if "country" in args.input_path:
-    x="countries"
-else:
-    x="languages"
+# Extract keys and values for plotting
+keys = [k for k, v in top10_sorted]
+values = [v for k, v in top10_sorted]
 
-# Create the bar chart
-plt.figure(figsize=(10, 6))
+# Create a bar graph
+plt.figure(figsize=(10,6))
 plt.bar(keys, values, color='skyblue')
-plt.xlabel(x)
-plt.ylabel(f'{args.key} occurances')
-plt.title(f'Top 10 {x} by {args.key}')
+plt.xlabel("Keys")
+plt.ylabel("Counts")
+plt.title("Top 10 keys for " + args.key)
 plt.xticks(rotation=45)
 plt.tight_layout()
 
-# Save the plot as a PNG image
-plt.savefig(f'{args.input_path + args.key}.png')
+# Save the bar graph as a PNG file. The filename is based on the input file and key.
+output_png = args.input_path + "_" + args.key + "_bar.png"
+plt.savefig(output_png)
+plt.close()
+
+print("Bar graph saved as", output_png)
